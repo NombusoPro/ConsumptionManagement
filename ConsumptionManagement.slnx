@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ConsumptionManagement.API/ConsumptionManagement.API.csproj" />
+  <Project Path="ConsumptionManagement/ConsumptionManagement.csproj" />
+</Solution>
