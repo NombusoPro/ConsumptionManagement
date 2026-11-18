@@ -1,0 +1,9 @@
+services:
+  sqlserver:
+    image: ://microsoft.com
+    container_name: consumption-sql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=StrongPassword123!
+    ports:
+      - "1433:1433"

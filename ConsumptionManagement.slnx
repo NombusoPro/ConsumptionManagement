@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="ConsumptionManagement.API/ConsumptionManagement.API.csproj" />
+  <Project Path="ConsumptionManagement.Tests/ConsumptionManagement.Tests.csproj" Id="0fa6907a-dfbc-49bf-836d-5e88074c9d34" />
   <Project Path="ConsumptionManagement/ConsumptionManagement.csproj" />
 </Solution>
