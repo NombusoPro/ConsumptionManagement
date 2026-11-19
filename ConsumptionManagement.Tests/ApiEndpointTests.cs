@@ -152,6 +152,41 @@ namespace ConsumptionManagement.Tests
         }
 
         [Fact]
+        public async Task Summary_uses_only_readings_inside_the_requested_range()
+        {
+            var meterId = await CreateMeterAsync("MTR-RANGE");
+            await PostReadingAsync(meterId, "2026-01-11T00:00:00Z", 10);
+            await PostReadingAsync(meterId, "2026-04-01T00:00:00Z", 100);
+            await PostReadingAsync(meterId, "2026-04-05T00:00:00Z", 180);
+            await PostReadingAsync(meterId, "2026-04-10T00:00:00Z", 180);
+            await PostReadingAsync(meterId, "2026-04-12T08:30:00Z", 200);
+            await PostReadingAsync(meterId, "2026-04-12T13:00:00Z", 300);
+
+            var april = await _client.GetFromJsonAsync<JsonElement>(
+                $"/api/meters/{meterId}/summary?fromUtc={Uri.EscapeDataString("2026-04-01T00:00:00Z")}&toUtc={Uri.EscapeDataString("2026-04-13T00:00:00Z")}");
+
+            Assert.Equal(200m, april.GetProperty("totalConsumptionKwh").GetDecimal());
+            var aprilDays = april.GetProperty("dailyConsumption").EnumerateArray().ToArray();
+            Assert.Equal(2, aprilDays.Length);
+            Assert.Equal("2026-04-05", aprilDays[0].GetProperty("date").GetString());
+            Assert.Equal(80m, aprilDays[0].GetProperty("consumptionKwh").GetDecimal());
+            Assert.Equal("2026-04-12", aprilDays[1].GetProperty("date").GetString());
+            Assert.Equal(120m, aprilDays[1].GetProperty("consumptionKwh").GetDecimal());
+
+            var fullSpan = await _client.GetFromJsonAsync<JsonElement>(
+                $"/api/meters/{meterId}/summary?fromUtc={Uri.EscapeDataString("2026-01-01T00:00:00Z")}&toUtc={Uri.EscapeDataString("2026-04-13T00:00:00Z")}");
+
+            Assert.Equal(290m, fullSpan.GetProperty("totalConsumptionKwh").GetDecimal());
+            var fullDays = fullSpan.GetProperty("dailyConsumption").EnumerateArray().ToArray();
+            Assert.Equal(
+                ["2026-04-01", "2026-04-05", "2026-04-12"],
+                fullDays.Select(day => day.GetProperty("date").GetString()).ToArray());
+            Assert.Equal(90m, fullDays[0].GetProperty("consumptionKwh").GetDecimal());
+            Assert.Equal(80m, fullDays[1].GetProperty("consumptionKwh").GetDecimal());
+            Assert.Equal(120m, fullDays[2].GetProperty("consumptionKwh").GetDecimal());
+        }
+
+        [Fact]
         public async Task Unique_constraint_violations_are_returned_as_409()
         {
             var context = new DefaultHttpContext();
