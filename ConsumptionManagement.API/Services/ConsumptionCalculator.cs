@@ -2,7 +2,7 @@ using ConsumptionManagement.API.Models;
 
 namespace ConsumptionManagement.API.Services
 {
-    public static class CalculateConsumption
+    public static class ConsumptionCalculator
     {
         public static ConsumptionSummaryDto Compute(
             IEnumerable<ConsumptionReading> readings,

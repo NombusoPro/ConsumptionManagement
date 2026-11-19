@@ -1,5 +1,4 @@
 ﻿using ConsumptionManagement.API.Models;
-using ConsumptionCalculator = ConsumptionManagement.API.Services.CalculateConsumption;
 
 namespace ConsumptionManagement.API.Services
 {
